@@ -1,0 +1,10 @@
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('Marvin Gaye', 'What`s Going On', 9, 1971);
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('The Beach Boys', 'Pet Sounds', 13, 1966);
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('Joni Mitchell', 'Blue', 10, 1971);
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('Stevie Wonder', 'Songs in the Key of Life', 21, 1976);
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('The Beatles', 'Abbey Road', 17, 1969);
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('Nirvana', 'Nevermind', 12, 1991);
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('Fleetwood Mac', 'Rumours', 11, 1977);
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('Prince and the Revolution', 'Purple Rain', 9, 1984);
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('Bob Dylan', 'Blood on the Tracks', 10, 1975);
+INSERT INTO album (artist, title, song_count, year_released) VALUES ('Lauryn Hill', 'The Miseducation of Lauryn Hill', 16, 1998);
