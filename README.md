@@ -2,6 +2,8 @@
 
 This project was developed as a tutorial on how to build a Spring Boot RESTful web service.
 
+For sample data the project uses musical artists and albums.
+
 This project showcases:
 * How to implement GET, POST, PUT and DELETE controller methods
 * How to return the correct HTTP response codes
@@ -9,6 +11,7 @@ This project showcases:
 * The "Controller-Service-Repository" pattern
 * The use of Lombok to reduce boiler plate code
 * How to use an in-memory H2 database
+* How to seed a database on startup
 * The dependencies required to support REST in Spring Boot
 * How to interact with controller methods using cURL
 
