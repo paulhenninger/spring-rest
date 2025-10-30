@@ -3,7 +3,6 @@ package com.thirdstone.spring_rest.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thirdstone.spring_rest.entity.Album;
 import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

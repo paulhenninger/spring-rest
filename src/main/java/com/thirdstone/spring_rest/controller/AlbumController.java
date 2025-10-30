@@ -63,9 +63,9 @@ public class AlbumController {
                 .map(existingAlbum -> {
                     album.setId(id);
                     albumService.createOrUpdateAlbum(album);
-                    return new ResponseEntity<Album>(album, HttpStatus.OK);
+                    return new ResponseEntity<>(album, HttpStatus.OK);
                 })
-                .orElse(new ResponseEntity<Album>(HttpStatus.NOT_FOUND));
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
@@ -75,6 +75,6 @@ public class AlbumController {
                     albumService.deleteAlbum(id);
                     return new ResponseEntity<Album>(HttpStatus.OK);
                 })
-                .orElse(new ResponseEntity<Album>(HttpStatus.NOT_FOUND));
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

@@ -9,7 +9,7 @@ This project showcases:
 * How to return the correct HTTP response codes
 * How to test the GET, POST, PUT and DELETE controller methods
 * The "Controller-Service-Repository" pattern
-* The use of Lombok to reduce boiler plate code
+* The use of Lombok to reduce boilerplate code
 * How to use an in-memory H2 database
 * How to seed a database on startup
 * The dependencies required to support REST in Spring Boot
@@ -21,7 +21,6 @@ This project showcases:
 ```shell
 ./gradlew clean build
 ```
-
 2. Run locally
 ```shell
 ./gradlew bootRun
