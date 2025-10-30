@@ -24,7 +24,6 @@ class SpringRestApplicationTests {
     @Test
     void contextLoads() {
         assertThat(albumController).isNotNull();
-        assertThat(albumController).isNotNull();
         assertThat(albumService).isNotNull();
         assertThat(albumRepository).isNotNull();
     }

@@ -116,7 +116,6 @@ public class AlbumControllerTest {
     }
 
     @Test
-    @Transactional
     void whenUpdateExistingAlbum_thenAssertUpdateResponseAndRead() throws Exception {
         ResponseEntity<Album> responseEntity = this.restTemplate.getForEntity(url + "/9", Album.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
