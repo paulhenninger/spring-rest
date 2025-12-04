@@ -1,5 +1,9 @@
 package com.thirdstone.spring_rest.service;
 
+import com.thirdstone.spring_rest.converter.AlbumConverter;
+import com.thirdstone.spring_rest.converter.ArtistConverter;
+import com.thirdstone.spring_rest.dto.AlbumDto;
+import com.thirdstone.spring_rest.dto.ArtistDto;
 import com.thirdstone.spring_rest.entity.Album;
 import com.thirdstone.spring_rest.repository.AlbumRepository;
 import org.springframework.stereotype.Service;
@@ -16,28 +20,33 @@ public class AlbumService {
         this.albumRepository = albumRepository;
     }
 
-    public List<Album> getAlbums() {
-        return albumRepository.findAll();
+    public List<AlbumDto> getAlbums() {
+        List<Album> albums = albumRepository.findAll();
+        return albums.stream().map(AlbumConverter::convertToDto).toList();
     }
 
-    public Optional<Album> getAlbumById(long id) {
-        return albumRepository.findById(id);
+    public Optional<AlbumDto> getAlbumById(long id) {
+        return albumRepository.findById(id).map(AlbumConverter::convertToDto);
     }
 
-    public Optional<List<Album>> getAlbumsByArtist(String artist) {
-        return albumRepository.findByArtist(artist);
+    public Optional<List<AlbumDto>> getAlbumsByArtist(ArtistDto artist) {
+        Optional<List<Album>> albums = albumRepository.findByArtist(ArtistConverter.convertFromDto(artist));
+        return albums.map(albumList -> albumList.stream().map(AlbumConverter::convertToDto).toList());
     }
 
-    public Optional<List<Album>> getAlbumsByTitle(String title) {
-        return albumRepository.findByTitle(title);
+    public Optional<List<AlbumDto>> getAlbumsByName(String name) {
+        Optional<List<Album>> albums = albumRepository.findByName(name);
+        return albums.map(albumList -> albumList.stream().map(AlbumConverter::convertToDto).toList());
     }
 
-    public Optional<List<Album>> getAlbumsByYearReleased(Integer yearReleased) {
-        return albumRepository.findByYearReleased(yearReleased);
+    public Optional<List<AlbumDto>> getAlbumsByYearReleased(Integer yearReleased) {
+        Optional<List<Album>> albums = albumRepository.findByYearReleased(yearReleased);
+        return albums.map(albumList -> albumList.stream().map(AlbumConverter::convertToDto).toList());
     }
 
-    public Album createOrUpdateAlbum(Album album) {
-        return albumRepository.saveAndFlush(album);
+    public AlbumDto createOrUpdateAlbum(AlbumDto albumDto) {
+        Album album =  albumRepository.saveAndFlush(AlbumConverter.convertFromDto(albumDto));
+        return AlbumConverter.convertToDto(album);
     }
 
     public void deleteAlbum(Long id) {

@@ -47,14 +47,14 @@ curl localhost:8080/api/v1/albums/artist/{name}
 ```shell
 curl -X POST localhost:8080/api/v1/albums \
      -H "Content-Type: application/json" \
-     -d '{ "artist": <name>, "title": <title>, "songCount": <n>, "yearReleased": <year> }'
+     -d '{ "artist": <name>, "name": <name>, "songCount": <n>, "yearReleased": <year> }'
 ```
 
 5. Update an existing album
 ```shell
 curl -X PUT localhost:8080/api/v1/albums/{id} \
      -H "Content-Type: application/json" \
-     -d '{ "artist": <name>, "title": <title>, "songCount": <n>, "yearReleased": <year> }'
+     -d '{ "artist": <name>, "name": <name>, "songCount": <n>, "yearReleased": <year> }'
 ```
 
 6. Delete an album by id

@@ -1,7 +1,10 @@
 package com.thirdstone.spring_rest.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.lang.NonNull;
 
 @Entity
@@ -9,7 +12,7 @@ import org.springframework.lang.NonNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude="artist")
 public class Album {
 
     @Id
@@ -19,11 +22,7 @@ public class Album {
 
     @NonNull
     @Column(nullable = false)
-    private String artist;
-
-    @NonNull
-    @Column(nullable = false)
-    private String title;
+    private String name;
 
     private Integer songCount;
 
@@ -31,10 +30,15 @@ public class Album {
     @Column(nullable = false)
     private Integer yearReleased;
 
-    public Album(String artist, String title, Integer songCount, Integer yearReleased) {
-        this.artist = artist;
-        this.title = title;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "artist_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Artist artist;
+
+    public Album(String name, Integer songCount, Integer yearReleased, Artist artist) {
+        this.name = name;
         this.songCount = songCount;
         this.yearReleased = yearReleased;
+        this.artist = artist;
     }
 }

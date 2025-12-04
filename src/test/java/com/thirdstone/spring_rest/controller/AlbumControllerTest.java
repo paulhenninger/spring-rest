@@ -1,7 +1,8 @@
 package com.thirdstone.spring_rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thirdstone.spring_rest.entity.Album;
+import com.thirdstone.spring_rest.dto.AlbumDto;
+import com.thirdstone.spring_rest.dto.ArtistDto;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AlbumControllerTest {
@@ -37,129 +39,161 @@ public class AlbumControllerTest {
 
     @Test
     void whenGetAllAlbums_thenAssertKnownData() throws Exception {
-        ResponseEntity<List<Album>> responseEntity = restTemplate.exchange(
+        ResponseEntity<List<AlbumDto>> responseEntity = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<>() {
-                });
+                new ParameterizedTypeReference<>() {}
+        );
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        List<Album> albums = responseEntity.getBody();
+        List<AlbumDto> albums = responseEntity.getBody();
         assertThat(albums).isNotEmpty();
     }
 
     @Test
     void whenGetExistingAlbum_thenAssertKnownData() throws Exception {
-        ResponseEntity<Album> responseEntity = this.restTemplate.getForEntity(url + "/1", Album.class);
+        ResponseEntity<AlbumDto> responseEntity = this.restTemplate.getForEntity(url + "/1", AlbumDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Album album = responseEntity.getBody();
+        AlbumDto album = responseEntity.getBody();
         assertThat(album).isNotNull();
         assertEquals(1, album.getId());
-        assertEquals("Marvin Gaye", album.getArtist());
-        assertEquals("What`s Going On", album.getTitle());
+        assertEquals("Marvin Gaye", album.getArtist().getName());
+        assertEquals("What`s Going On", album.getName());
+        assertEquals(9, album.getSongCount());
+        assertEquals(1971, album.getYearReleased());
+    }
+
+    @Test
+    void whenGetExistingAlbumsByArtist_thenAssertKnownData() throws Exception {
+        ArtistDto artist = new ArtistDto(1, "Marvin Gaye");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ArtistDto> requestEntity = new HttpEntity<>(artist, headers);
+
+
+        ResponseEntity<List<AlbumDto>> responseEntity = restTemplate.exchange(
+                url + "/artist",
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<List<AlbumDto>>() {}
+        );
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        List<AlbumDto> albums = responseEntity.getBody();
+        assertThat(albums).isNotNull();
+        assertEquals(1, albums.size());
+        AlbumDto album = albums.get(0);
+        assertEquals(1, album.getId());
+        assertEquals("Marvin Gaye", album.getArtist().getName());
+        assertEquals("What`s Going On", album.getName());
         assertEquals(9, album.getSongCount());
         assertEquals(1971, album.getYearReleased());
     }
 
     @Test
     void whenGetNonexistentId_thenAssertNotFound() throws Exception {
-        ResponseEntity<Album> responseEntity = this.restTemplate.getForEntity(url + "/100", Album.class);
+        ResponseEntity<AlbumDto> responseEntity = this.restTemplate.getForEntity(url + "/100", AlbumDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(responseEntity.getBody()).isNull();
     }
 
     @Test
     void whenCreateAlbum_thenAssertCreateResponseAndRead() throws Exception {
-        Album album = new Album("The Beatles", "Revolver", 1, 1966);
+        ArtistDto artist = new ArtistDto(5, "The Beatles");
+        AlbumDto album = new AlbumDto("Revolver", 1, 1966, artist);
 
-        ResponseEntity<Album> responseEntity = this.restTemplate.postForEntity(url, album, Album.class);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        Album createdAlbum = responseEntity.getBody();
+        ResponseEntity<AlbumDto> albumResponseEntity = this.restTemplate.postForEntity(url, album, AlbumDto.class);
+        assertThat(albumResponseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        AlbumDto createdAlbum = albumResponseEntity.getBody();
         assertEquals(11, createdAlbum.getId());
-        assertEquals(album.getArtist(), createdAlbum.getArtist());
-        assertEquals(album.getTitle(), createdAlbum.getTitle());
+        assertEquals(album.getArtist().getName(), createdAlbum.getArtist().getName());
+        assertEquals(album.getName(), createdAlbum.getName());
         assertEquals(album.getSongCount(), createdAlbum.getSongCount());
         assertEquals(album.getYearReleased(), createdAlbum.getYearReleased());
 
-        responseEntity = this.restTemplate.getForEntity(url + "/11", Album.class);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Album readAlbum = responseEntity.getBody();
+        albumResponseEntity = this.restTemplate.getForEntity(url + "/11", AlbumDto.class);
+        assertThat(albumResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        AlbumDto readAlbum = albumResponseEntity.getBody();
         assertEquals(createdAlbum, readAlbum);
     }
 
     @Test
-    void whenCreateAlbumWithMissingAlbum_thenAssertBadRequest() throws Exception {
-        Album album = new Album("The Clash", null, 16, 1979);
+    void whenCreateAlbumWithMissingName_thenAssertBadRequest() throws Exception {
+        ArtistDto artist = new ArtistDto(5, "The Beatles");
+        AlbumDto album = new AlbumDto(null, 16, 1979, artist);
 
-        ResponseEntity<Album> responseEntity = this.restTemplate.postForEntity(url, album, Album.class);
+        ResponseEntity<AlbumDto> responseEntity = this.restTemplate.postForEntity(url, album, AlbumDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(responseEntity.getBody()).isNotNull();
     }
 
     @Test
     void whenCreateAlbumWithMissingArtist_thenAssertBadRequest() throws Exception {
-        Album album = new Album(null, "London Calling", 16, 1979);
+        AlbumDto album = new AlbumDto("London Calling", 16, 1979, null);
 
-        ResponseEntity<Album> responseEntity = this.restTemplate.postForEntity(url, album, Album.class);
+        ResponseEntity<AlbumDto> responseEntity = this.restTemplate.postForEntity(url, album, AlbumDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(responseEntity.getBody()).isNotNull();
     }
 
     @Test
     void whenCreateAlbumWithMissingYearReleased_thenAssertBadRequest() throws Exception {
-        Album album = new Album("The Clash", "London Calling", 16, null);
+        ArtistDto artist = new ArtistDto(11, "The Clash");
+        AlbumDto album = new AlbumDto("London Calling", 16, null, artist);
 
-        ResponseEntity<Album> responseEntity = this.restTemplate.postForEntity(url, album, Album.class);
+        ResponseEntity<AlbumDto> responseEntity = this.restTemplate.postForEntity(url, album, AlbumDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(responseEntity.getBody()).isNotNull();
     }
 
     @Test
     void whenUpdateExistingAlbum_thenAssertUpdateResponseAndRead() throws Exception {
-        ResponseEntity<Album> responseEntity = this.restTemplate.getForEntity(url + "/9", Album.class);
+        ResponseEntity<AlbumDto> responseEntity = this.restTemplate.getForEntity(url + "/9", AlbumDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isNotNull();
-        Album album = responseEntity.getBody();
+        AlbumDto album = responseEntity.getBody();
         assertEquals(9, album.getId());
-        assertEquals("Bob Dylan", album.getArtist());
-        assertEquals("Blood on the Tracks", album.getTitle());
+        assertEquals("Bob Dylan", album.getArtist().getName());
+        assertEquals("Blood on the Tracks", album.getName());
         assertEquals(10, album.getSongCount());
         assertEquals(1975, album.getYearReleased());
 
-        album.setArtist("Robert Zimmerman");
+        album.setName("Blonde on Blonde");
+        album.setSongCount(14);
+        album.setYearReleased(1966);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        HttpEntity<Album> requestEntity = new HttpEntity<>(album, headers);
-        ResponseEntity<Album> responseEntityAlbum = restTemplate.exchange(
+        HttpEntity<AlbumDto> requestEntity = new HttpEntity<>(album, headers);
+        ResponseEntity<AlbumDto> responseEntityAlbum = restTemplate.exchange(
                 url + "/9",
                 HttpMethod.PUT,
                 requestEntity,
-                Album.class);
+                AlbumDto.class);
 
         assertThat(responseEntityAlbum.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Album updatedAlbum = responseEntityAlbum.getBody();
+        AlbumDto updatedAlbum = responseEntityAlbum.getBody();
         assertEquals(album, updatedAlbum);
 
-        responseEntity = this.restTemplate.getForEntity(url + "/9", Album.class);
+        responseEntity = this.restTemplate.getForEntity(url + "/9", AlbumDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isNotNull();
-        Album readAlbum = responseEntity.getBody();
-        assertEquals(album, readAlbum);
+        AlbumDto readAlbum = responseEntity.getBody();
+        assertEquals(updatedAlbum, readAlbum);
     }
 
     @Test
     void whenUpdateNonExistingAlbum_thenAssertNotFound() throws Exception {
-        Album album = new Album("The Beatles", "Revolver", 1, 1966);
+        ArtistDto artist = new ArtistDto(5, "The Beatles");
+        AlbumDto album = new AlbumDto("Revolver", 1, 1966, artist);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        HttpEntity<Album> requestEntity = new HttpEntity<>(album, headers);
-        ResponseEntity<Album> responseEntity = restTemplate.exchange(
+        HttpEntity<AlbumDto> requestEntity = new HttpEntity<>(album, headers);
+        ResponseEntity<AlbumDto> responseEntity = restTemplate.exchange(
                 url + "/100",
                 HttpMethod.PUT,
                 requestEntity,
-                Album.class);
+                AlbumDto.class);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(responseEntity.getBody()).isNull();
@@ -167,13 +201,13 @@ public class AlbumControllerTest {
 
     @Test
     void whenDeleteExistingAlbum_thenAssertResponseAndRead() throws Exception {
-        ResponseEntity<Album> responseEntity = this.restTemplate.getForEntity(url + "/3", Album.class);
+        ResponseEntity<AlbumDto> responseEntity = this.restTemplate.getForEntity(url + "/3", AlbumDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isNotNull();
-        Album album = responseEntity.getBody();
+        AlbumDto album = responseEntity.getBody();
         assertEquals(3, album.getId());
-        assertEquals("Joni Mitchell", album.getArtist());
-        assertEquals("Blue", album.getTitle());
+        assertEquals("Joni Mitchell", album.getArtist().getName());
+        assertEquals("Blue", album.getName());
         assertEquals(10, album.getSongCount());
         assertEquals(1971, album.getYearReleased());
 
@@ -184,7 +218,7 @@ public class AlbumControllerTest {
                 Void.class);
         assertThat(responseEntityDelete.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        responseEntity = this.restTemplate.getForEntity(url + "/3", Album.class);
+        responseEntity = this.restTemplate.getForEntity(url + "/3", AlbumDto.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(responseEntity.getBody()).isNull();
     }
