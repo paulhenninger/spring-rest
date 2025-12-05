@@ -9,6 +9,8 @@ This project showcases:
 * How to return the correct HTTP response codes
 * How to test the GET, POST, PUT and DELETE controller methods
 * The "Controller-Service-Repository" pattern
+* Conversion between DTO and entity objects
+* Validation on controller input data
 * The use of Lombok to reduce boilerplate code
 * How to use an in-memory H2 database
 * How to seed a database on startup
