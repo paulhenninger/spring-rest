@@ -16,7 +16,6 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AlbumControllerTest {
@@ -43,7 +42,8 @@ public class AlbumControllerTest {
                 url,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<AlbumDto> albums = responseEntity.getBody();
@@ -75,13 +75,14 @@ public class AlbumControllerTest {
                 url + "/artist",
                 HttpMethod.POST,
                 requestEntity,
-                new ParameterizedTypeReference<List<AlbumDto>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<AlbumDto> albums = responseEntity.getBody();
         assertThat(albums).isNotNull();
         assertEquals(1, albums.size());
-        AlbumDto album = albums.get(0);
+        AlbumDto album = albums.getFirst();
         assertEquals(1, album.getId());
         assertEquals("Marvin Gaye", album.getArtist().getName());
         assertEquals("What`s Going On", album.getName());

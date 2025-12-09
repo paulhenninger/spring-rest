@@ -41,7 +41,8 @@ public class ArtistControllerTest {
                 url,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<ArtistDto> artists = responseEntity.getBody();

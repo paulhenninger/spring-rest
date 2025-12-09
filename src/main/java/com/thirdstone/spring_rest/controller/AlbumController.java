@@ -2,7 +2,6 @@ package com.thirdstone.spring_rest.controller;
 
 import com.thirdstone.spring_rest.dto.AlbumDto;
 import com.thirdstone.spring_rest.dto.ArtistDto;
-import com.thirdstone.spring_rest.entity.Artist;
 import com.thirdstone.spring_rest.service.AlbumService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
